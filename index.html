@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>แบบประเมินความพึงพอใจ</title>
+<title>แบบประเมิน</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,7 +15,6 @@ body{
   margin:0;
 }
 
-/* เมนูด้านบน */
 .nav{
   background:#059669;
   padding:12px;
@@ -34,7 +33,6 @@ body{
   cursor:pointer;
 }
 
-/* กล่องฟอร์ม */
 .container{
   max-width:650px;
   margin:30px auto;
@@ -65,10 +63,8 @@ input,select,textarea{
   transition:0.3s;
 }
 
-/* เส้นเขียวเมื่อเลือกแล้ว */
 .question.answered{
   border-bottom:4px solid #10b981;
-  padding-bottom:10px;
 }
 
 .rating span{
@@ -105,7 +101,8 @@ button.submit{
 </div>
 
 <div class="container">
-<h1>แบบประเมินความพึงพอใจ</h1>
+
+<h1 id="formTitle">แบบประเมินความพึงพอใจ</h1>
 
 <input type="text" id="name" placeholder="ชื่อ">
 <input type="number" id="no" placeholder="เลขที่">
@@ -123,11 +120,12 @@ button.submit{
 <textarea id="suggestion" placeholder="ข้อเสนอแนะเพิ่มเติม"></textarea>
 
 <button class="submit" onclick="submitForm()">ส่งแบบประเมิน</button>
+
 </div>
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXudxK37GueTXEWFxJPvsUQsecwrOIbhw3SV_-dk5G0i2PlUYKbF8EmP9C2N7gMwss/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygYmC-VC35wmBYr5nJc2J36Z3ps1FiJFfXZ0meSdeMwvpJCKIWu30-PCy5Fkpvrj4U/exec";
 
 function go(page){
   window.location.href = page;
@@ -143,11 +141,16 @@ function loadQuestions(){
 }
 
 function renderQuestions(data){
-  questionData = data;
+
+  // ตั้งหัวข้อจาก Google Sheet
+  document.getElementById("formTitle").innerText = data.title;
+
+  questionData = data.questions;
+
   const container = document.getElementById("questions");
   container.innerHTML="";
 
-  data.forEach(q=>{
+  questionData.forEach(q=>{
     const div = document.createElement("div");
     div.className="question";
 
@@ -173,7 +176,6 @@ function selectScore(qid,score,el){
     .forEach(s=>s.classList.remove("selected"));
 
   el.classList.add("selected");
-
   el.closest(".question").classList.add("answered");
 }
 
@@ -222,4 +224,3 @@ loadQuestions();
 
 </body>
 </html>
-
