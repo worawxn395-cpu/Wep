@@ -13,52 +13,77 @@ body{
   font-family:'Noto Sans Thai',sans-serif;
   margin:0;
   padding:20px;
-  background:linear-gradient(135deg,#d4f5e9,#b7f0da);
+  background:linear-gradient(135deg,#ecfdf5,#d1fae5);
 }
 
 .container{
-  max-width:1100px;
+  max-width:1200px;
   margin:auto;
 }
 
 .back-btn{
   padding:8px 16px;
   border:none;
-  background:#059669;
+  background:#334155;
   color:white;
   border-radius:20px;
   cursor:pointer;
-  margin-bottom:15px;
+  margin-bottom:20px;
 }
 
 .back-btn:hover{
-  background:#047857;
-}
-
-.card{
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  margin-bottom:20px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  background:#1e293b;
 }
 
 h1{
   text-align:center;
-  color:#047857;
+  margin-bottom:30px;
+  color:#065f46;
 }
 
-button{
-  padding:10px 15px;
-  border:none;
-  background:#10b981;
+/* ===== Summary Cards ===== */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.card{
+  padding:20px;
+  border-radius:15px;
   color:white;
-  border-radius:8px;
-  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-button:hover{
-  background:#059669;
+.card.total{ background:linear-gradient(135deg,#10b981,#059669); }
+.card.male{ background:linear-gradient(135deg,#3b82f6,#1d4ed8); }
+.card.female{ background:linear-gradient(135deg,#ec4899,#be185d); }
+
+.card h2{
+  margin:0;
+  font-size:16px;
+  opacity:0.9;
+}
+
+.card h1{
+  margin:10px 0 0;
+  font-size:28px;
+  color:white;
+}
+
+/* ===== Chart Section ===== */
+.chart-box{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:25px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.chart-box h3{
+  margin-top:0;
+  color:#065f46;
 }
 
 canvas{
@@ -71,31 +96,40 @@ canvas{
 
 <div class="container">
 
-<button class="back-btn" onclick="goHome()">
-⬅ กลับไปทำแบบประเมิน
-</button>
+<button class="back-btn" onclick="goHome()">⬅ กลับไปทำแบบประเมิน</button>
 
 <h1>Dashboard แบบประเมินความพึงพอใจ</h1>
 
-<div class="card">
-<h2>จำนวนนักเรียนทั้งหมด</h2>
-<h1 id="total">0</h1>
-<button onclick="loadData()">รีเฟรช</button>
+<div class="summary">
+  <div class="card total">
+    <h2>นักเรียนทั้งหมด</h2>
+    <h1 id="total">0</h1>
+  </div>
+
+  <div class="card male">
+    <h2>นักเรียนชาย</h2>
+    <h1 id="maleCount">0</h1>
+  </div>
+
+  <div class="card female">
+    <h2>นักเรียนหญิง</h2>
+    <h1 id="femaleCount">0</h1>
+  </div>
 </div>
 
-<div class="card">
-<h2>สัดส่วนเพศ</h2>
-<canvas id="genderChart"></canvas>
+<div class="chart-box">
+  <h3>สัดส่วนเพศ</h3>
+  <canvas id="genderChart"></canvas>
 </div>
 
-<div class="card">
-<h2>จำนวนนักเรียนรายห้อง</h2>
-<canvas id="roomChart"></canvas>
+<div class="chart-box">
+  <h3>จำนวนนักเรียนรายห้อง</h3>
+  <canvas id="roomChart"></canvas>
 </div>
 
-<div class="card">
-<h2>คะแนนเฉลี่ยแต่ละข้อ</h2>
-<canvas id="scoreChart"></canvas>
+<div class="chart-box">
+  <h3>คะแนนเฉลี่ยแต่ละข้อ</h3>
+  <canvas id="scoreChart"></canvas>
 </div>
 
 </div>
@@ -119,15 +153,17 @@ function loadData(){
 function renderDashboard(data){
 
   document.getElementById("total").innerText = data.total;
+  document.getElementById("maleCount").innerText = data.male;
+  document.getElementById("femaleCount").innerText = data.female;
 
   if(genderChart) genderChart.destroy();
   genderChart = new Chart(document.getElementById("genderChart"),{
-    type:"pie",
+    type:"doughnut",
     data:{
       labels:["ชาย","หญิง"],
       datasets:[{
         data:[data.male,data.female],
-        backgroundColor:["#34d399","#10b981"]
+        backgroundColor:["#3b82f6","#ec4899"]
       }]
     }
   });
@@ -140,7 +176,7 @@ function renderDashboard(data){
       datasets:[{
         label:"จำนวน",
         data:Object.values(data.rooms),
-        backgroundColor:"#059669"
+        backgroundColor:"#10b981"
       }]
     }
   });
@@ -154,10 +190,11 @@ function renderDashboard(data){
         label:"คะแนนเฉลี่ย",
         data:data.avgScores,
         backgroundColor:[
-          "#34d399","#6ee7b7","#10b981","#059669","#047857"
+          "#f59e0b","#10b981","#3b82f6","#ec4899","#8b5cf6"
         ]
       }]
-    }
+    },
+    options:{scales:{y:{min:0,max:5}}}
   });
 
 }
