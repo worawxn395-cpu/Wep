@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  font-family:'Noto Sans Thai',sans-serif;
+  margin:0;
+  padding:20px;
+  background:linear-gradient(135deg,#d4f5e9,#b7f0da);
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+h1{
+  text-align:center;
+  color:#047857;
+}
+button{
+  padding:10px 15px;
+  border:none;
+  background:#10b981;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+button:hover{
+  background:#059669;
+}
+canvas{
+  max-width:100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Dashboard แบบประเมินความพึงพอใจ</h1>
+
+<div class="card">
+<h2>จำนวนนักเรียนทั้งหมด</h2>
+<h1 id="total">0</h1>
+<button onclick="loadData()">รีเฟรช</button>
+</div>
+
+<div class="card">
+<h2>สัดส่วนเพศ</h2>
+<canvas id="genderChart"></canvas>
+</div>
+
+<div class="card">
+<h2>จำนวนนักเรียนรายห้อง</h2>
+<canvas id="roomChart"></canvas>
+</div>
+
+<div class="card">
+<h2>คะแนนเฉลี่ยแต่ละข้อ</h2>
+<canvas id="scoreChart"></canvas>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNzBCJ_-hgMBcjCnTinrOxbSgOvtreewRR2zYP6igsPO7AvKctwgsaKmZux36n0ysB/exec";
+
+let genderChart, roomChart, scoreChart;
+
+function loadData(){
+  const script = document.createElement("script");
+  script.src = SCRIPT_URL + "?action=getDashboard&callback=renderDashboard";
+  document.body.appendChild(script);
+}
+
+function renderDashboard(data){
+
+  document.getElementById("total").innerText = data.total;
+
+  if(genderChart) genderChart.destroy();
+  genderChart = new Chart(document.getElementById("genderChart"),{
+    type:"pie",
+    data:{
+      labels:["ชาย","หญิง"],
+      datasets:[{
+        data:[data.male,data.female],
+        backgroundColor:["#34d399","#10b981"]
+      }]
+    }
+  });
+
+  if(roomChart) roomChart.destroy();
+  roomChart = new Chart(document.getElementById("roomChart"),{
+    type:"bar",
+    data:{
+      labels:Object.keys(data.rooms),
+      datasets:[{
+        label:"จำนวน",
+        data:Object.values(data.rooms),
+        backgroundColor:"#059669"
+      }]
+    }
+  });
+
+  if(scoreChart) scoreChart.destroy();
+  scoreChart = new Chart(document.getElementById("scoreChart"),{
+    type:"bar",
+    data:{
+      labels:data.avgScores.map((_,i)=>"ข้อ "+(i+1)),
+      datasets:[{
+        label:"คะแนนเฉลี่ย",
+        data:data.avgScores,
+        backgroundColor:[
+          "#34d399","#6ee7b7","#10b981","#059669","#047857"
+        ]
+      }]
+    }
+  });
+
+}
+
+loadData();
+setInterval(loadData,60000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin แก้ไขคำถาม</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+body{
+  font-family:'Noto Sans Thai',sans-serif;
+  background:#d4f5e9;
+  padding:20px;
+}
+.container{
+  max-width:800px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:15px;
+}
+.question-block{
+  border:1px solid #ccc;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+}
+input{
+  width:100%;
+  padding:8px;
+  margin-bottom:8px;
+}
+button{
+  padding:10px;
+  border:none;
+  background:#10b981;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>จัดการคำถามแบบประเมิน</h2>
+
+<div id="questionContainer"></div>
+
+<button onclick="addQuestion()">➕ เพิ่มคำถาม</button>
+<button onclick="saveQuestions()">💾 บันทึกการแก้ไข</button>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNzBCJ_-hgMBcjCnTinrOxbSgOvtreewRR2zYP6igsPO7AvKctwgsaKmZux36n0ysB/exec";
+
+let questions=[];
+
+function loadQuestions(){
+  const script=document.createElement("script");
+  script.src=SCRIPT_URL+"?action=getQuestions&callback=renderQuestions";
+  document.body.appendChild(script);
+}
+
+function renderQuestions(data){
+  questions=data;
+  displayQuestions();
+}
+
+function displayQuestions(){
+  const container=document.getElementById("questionContainer");
+  container.innerHTML="";
+
+  questions.forEach((q,index)=>{
+    container.innerHTML+=`
+      <div class="question-block">
+        <input value="${q.question}" onchange="updateQuestion(${index},this.value)">
+        5:<input value="${q.emoji[5]}" onchange="updateEmoji(${index},5,this.value)">
+        4:<input value="${q.emoji[4]}" onchange="updateEmoji(${index},4,this.value)">
+        3:<input value="${q.emoji[3]}" onchange="updateEmoji(${index},3,this.value)">
+        2:<input value="${q.emoji[2]}" onchange="updateEmoji(${index},2,this.value)">
+        1:<input value="${q.emoji[1]}" onchange="updateEmoji(${index},1,this.value)">
+        <button onclick="deleteQuestion(${index})">ลบ</button>
+      </div>
+    `;
+  });
+}
+
+function updateQuestion(i,value){
+  questions[i].question=value;
+}
+
+function updateEmoji(i,score,value){
+  questions[i].emoji[score]=value;
+}
+
+function addQuestion(){
+  questions.push({
+    question:"คำถามใหม่",
+    emoji:{5:"😍",4:"😊",3:"😐",2:"😕",1:"😡"}
+  });
+  displayQuestions();
+}
+
+function deleteQuestion(i){
+  questions.splice(i,1);
+  displayQuestions();
+}
+
+function saveQuestions(){
+
+  fetch(SCRIPT_URL+"?action=updateQuestions",{
+    method:"POST",
+    body:JSON.stringify(questions)
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    Swal.fire("บันทึกสำเร็จ","คำถามถูกอัปเดตแล้ว","success");
+  });
+
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบประเมินความพึงพอใจ</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+body{
+  font-family:'Noto Sans Thai',sans-serif;
+  background:linear-gradient(135deg,#d4f5e9,#b7f0da);
+  margin:0;
+  padding:20px;
+}
+.container{
+  max-width:600px;
+  margin:auto;
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+h1{
+  text-align:center;
+  color:#059669;
+}
+label{
+  font-weight:600;
+}
+input,select,textarea{
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+.question{
+  margin-bottom:20px;
+}
+.rating span{
+  font-size:24px;
+  cursor:pointer;
+  margin-right:10px;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#10b981;
+  border:none;
+  color:white;
+  font-size:16px;
+  border-radius:10px;
+  cursor:pointer;
+}
+button:hover{
+  background:#059669;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>แบบประเมินความพึงพอใจ</h1>
+
+<label>ชื่อ</label>
+<input type="text" id="name">
+
+<label>เลขที่</label>
+<input type="number" id="no">
+
+<label>เพศ</label>
+<select id="gender">
+<option value="">-- เลือก --</option>
+<option>ชาย</option>
+<option>หญิง</option>
+</select>
+
+<label>ห้องเรียน</label>
+<input type="text" id="room">
+
+<div id="questions"></div>
+
+<label>ข้อเสนอแนะเพิ่มเติม</label>
+<textarea id="suggestion"></textarea>
+
+<button onclick="submitForm()">ส่งแบบประเมิน</button>
+</div>
+
+<script>
+    //ชื่อกับแอปชีต
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNzBCJ_-hgMBcjCnTinrOxbSgOvtreewRR2zYP6igsPO7AvKctwgsaKmZux36n0ysB/exec";
+
+
+let questionData = [];
+let answers = {};
+
+function loadQuestions(){
+  const script = document.createElement("script");
+  script.src = SCRIPT_URL + "?action=getQuestions&callback=renderQuestions";
+  document.body.appendChild(script);
+}
+
+function renderQuestions(data){
+  questionData = data;
+  const container = document.getElementById("questions");
+  container.innerHTML="";
+
+  data.forEach(q=>{
+    const div = document.createElement("div");
+    div.className="question";
+    div.innerHTML = `
+      <label>${q.id}. ${q.question}</label>
+      <div class="rating">
+        ${[5,4,3,2,1].map(score=>
+          `<span onclick="selectScore(${q.id},${score})">${q.emoji[score]}</span>`
+        ).join("")}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function selectScore(qid,score){
+  answers[qid]=score;
+}
+
+function submitForm(){
+
+  const name = document.getElementById("name").value;
+  const no = document.getElementById("no").value;
+  const gender = document.getElementById("gender").value;
+  const room = document.getElementById("room").value;
+  const suggestion = document.getElementById("suggestion").value;
+
+  if(!name || !no || !gender || !room){
+    Swal.fire("กรอกข้อมูลให้ครบก่อน");
+    return;
+  }
+
+  if(Object.keys(answers).length !== questionData.length){
+    Swal.fire("กรุณาตอบคำถามให้ครบทุกข้อ");
+    return;
+  }
+
+  Swal.showLoading();
+
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      name:name,
+      no:no,
+      gender:gender,
+      room:room,
+      answers:Object.values(answers),
+      suggestion:suggestion
+    })
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    Swal.fire("บันทึกสำเร็จ","ขอบคุณสำหรับการประเมิน","success");
+    location.reload();
+  });
+
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>
