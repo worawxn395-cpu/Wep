@@ -51,7 +51,14 @@ canvas{
 
 <div class="container">
 <h1>Dashboard แบบประเมินความพึงพอใจ</h1>
+  
+<button onclick="goHome()">⬅ กลับไปทำแบบประเมิน</button>
 
+<script>
+function goHome(){
+  window.location.href="index.html";
+}
+</script>
 <div class="card">
 <h2>จำนวนนักเรียนทั้งหมด</h2>
 <h1 id="total">0</h1>
@@ -138,4 +145,5 @@ setInterval(loadData,60000);
 
 </body>
 </html>
+
 
