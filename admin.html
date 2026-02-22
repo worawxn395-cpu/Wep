@@ -11,27 +11,50 @@
 <style>
 body{
   font-family:'Noto Sans Thai',sans-serif;
-  background:#d4f5e9;
+  background:linear-gradient(135deg,#d4f5e9,#b7f0da);
+  margin:0;
   padding:20px;
 }
+
 .container{
   max-width:800px;
   margin:auto;
   background:white;
-  padding:20px;
+  padding:25px;
   border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
+
+.back-btn{
+  padding:8px 16px;
+  border:none;
+  background:#059669;
+  color:white;
+  border-radius:20px;
+  cursor:pointer;
+  margin-bottom:15px;
+}
+
+.back-btn:hover{
+  background:#047857;
+}
+
 .question-block{
-  border:1px solid #ccc;
+  border:1px solid #ddd;
   padding:15px;
   margin-bottom:15px;
   border-radius:10px;
+  background:#f9fffb;
 }
+
 input{
   width:100%;
   padding:8px;
   margin-bottom:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
+
 button{
   padding:10px;
   border:none;
@@ -39,25 +62,25 @@ button{
   color:white;
   border-radius:8px;
   cursor:pointer;
-  margin-top:10px;
+  margin-top:8px;
+}
+
+button:hover{
+  background:#059669;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
-  <h2>จัดการคำถามแบบประเมิน</h2>
 
-  <button onclick="goHome()">⬅ กลับไปทำแบบประเมิน</button>
+<h2>จัดการคำถามแบบประเมิน</h2>
 
-  <div id="questionContainer"></div>
-</div>
+<button class="back-btn" onclick="goHome()">
+⬅ กลับไปทำแบบประเมิน
+</button>
 
-<script>
-function goHome(){
-  window.location.href="index.html";
-}
-</script>
 <div id="questionContainer"></div>
 
 <button onclick="addQuestion()">➕ เพิ่มคำถาม</button>
@@ -66,6 +89,11 @@ function goHome(){
 </div>
 
 <script>
+
+function goHome(){
+  window.location.href="index.html";
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXudxK37GueTXEWFxJPvsUQsecwrOIbhw3SV_-dk5G0i2PlUYKbF8EmP9C2N7gMwss/exec";
 
 let questions=[];
@@ -128,17 +156,15 @@ function saveQuestions(){
     body:JSON.stringify(questions)
   })
   .then(res=>res.json())
-  .then(data=>{
+  .then(()=>{
     Swal.fire("บันทึกสำเร็จ","คำถามถูกอัปเดตแล้ว","success");
   });
 
 }
 
 loadQuestions();
+
 </script>
 
 </body>
 </html>
-
-
-
