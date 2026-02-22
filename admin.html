@@ -25,28 +25,6 @@ body{
   box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
 
-.back-btn{
-  padding:8px 16px;
-  border:none;
-  background:#059669;
-  color:white;
-  border-radius:20px;
-  cursor:pointer;
-  margin-bottom:15px;
-}
-
-.back-btn:hover{
-  background:#047857;
-}
-
-.question-block{
-  border:1px solid #ddd;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-  background:#f9fffb;
-}
-
 input{
   width:100%;
   padding:8px;
@@ -68,6 +46,14 @@ button{
 button:hover{
   background:#059669;
 }
+
+.question-block{
+  border:1px solid #ddd;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+  background:#f9fffb;
+}
 </style>
 </head>
 
@@ -77,14 +63,15 @@ button:hover{
 
 <h2>จัดการคำถามแบบประเมิน</h2>
 
-<button class="back-btn" onclick="goHome()">
-⬅ กลับไปทำแบบประเมิน
-</button>
+<button onclick="goHome()">⬅ กลับไปหน้าแบบประเมิน</button>
+
+<h3>หัวข้อแบบประเมิน</h3>
+<input type="text" id="titleInput">
 
 <div id="questionContainer"></div>
 
 <button onclick="addQuestion()">➕ เพิ่มคำถาม</button>
-<button onclick="saveQuestions()">💾 บันทึกการแก้ไข</button>
+<button onclick="saveAll()">💾 บันทึกทั้งหมด</button>
 
 </div>
 
@@ -94,7 +81,7 @@ function goHome(){
   window.location.href="index.html";
 }
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXudxK37GueTXEWFxJPvsUQsecwrOIbhw3SV_-dk5G0i2PlUYKbF8EmP9C2N7gMwss/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygYmC-VC35wmBYr5nJc2J36Z3ps1FiJFfXZ0meSdeMwvpJCKIWu30-PCy5Fkpvrj4U/exec";
 
 let questions=[];
 
@@ -105,7 +92,11 @@ function loadQuestions(){
 }
 
 function renderQuestions(data){
-  questions=data;
+
+  // ตั้งหัวข้อ
+  document.getElementById("titleInput").value = data.title;
+
+  questions = data.questions;
   displayQuestions();
 }
 
@@ -116,6 +107,7 @@ function displayQuestions(){
   questions.forEach((q,index)=>{
     container.innerHTML+=`
       <div class="question-block">
+        <b>ID: ${q.id}</b>
         <input value="${q.question}" onchange="updateQuestion(${index},this.value)">
         5:<input value="${q.emoji[5]}" onchange="updateEmoji(${index},5,this.value)">
         4:<input value="${q.emoji[4]}" onchange="updateEmoji(${index},4,this.value)">
@@ -138,6 +130,7 @@ function updateEmoji(i,score,value){
 
 function addQuestion(){
   questions.push({
+    id: questions.length + 1,
     question:"คำถามใหม่",
     emoji:{5:"😍",4:"😊",3:"😐",2:"😕",1:"😡"}
   });
@@ -149,15 +142,24 @@ function deleteQuestion(i){
   displayQuestions();
 }
 
-function saveQuestions(){
+function saveAll(){
 
-  fetch(SCRIPT_URL+"?action=updateQuestions",{
+  const newTitle = document.getElementById("titleInput").value;
+
+  // บันทึกหัวข้อ
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({title:newTitle})
+  });
+
+  // บันทึกคำถาม
+  fetch(SCRIPT_URL,{
     method:"POST",
     body:JSON.stringify(questions)
   })
   .then(res=>res.json())
   .then(()=>{
-    Swal.fire("บันทึกสำเร็จ","คำถามถูกอัปเดตแล้ว","success");
+    Swal.fire("บันทึกสำเร็จ","อัปเดตข้อมูลเรียบร้อย","success");
   });
 
 }
