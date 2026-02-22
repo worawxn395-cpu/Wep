@@ -47,7 +47,13 @@ button{
 
 <div class="container">
 <h2>จัดการคำถามแบบประเมิน</h2>
+<button onclick="goHome()">⬅ กลับไปทำแบบประเมิน</button>
 
+<script>
+function goHome(){
+  window.location.href="index.html";
+}
+</script>
 <div id="questionContainer"></div>
 
 <button onclick="addQuestion()">➕ เพิ่มคำถาม</button>
@@ -129,5 +135,6 @@ loadQuestions();
 
 </body>
 </html>
+
 
 
