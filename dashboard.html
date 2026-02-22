@@ -15,10 +15,26 @@ body{
   padding:20px;
   background:linear-gradient(135deg,#d4f5e9,#b7f0da);
 }
+
 .container{
   max-width:1100px;
   margin:auto;
 }
+
+.back-btn{
+  padding:8px 16px;
+  border:none;
+  background:#059669;
+  color:white;
+  border-radius:20px;
+  cursor:pointer;
+  margin-bottom:15px;
+}
+
+.back-btn:hover{
+  background:#047857;
+}
+
 .card{
   background:white;
   padding:20px;
@@ -26,10 +42,12 @@ body{
   margin-bottom:20px;
   box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
+
 h1{
   text-align:center;
   color:#047857;
 }
+
 button{
   padding:10px 15px;
   border:none;
@@ -38,9 +56,11 @@ button{
   border-radius:8px;
   cursor:pointer;
 }
+
 button:hover{
   background:#059669;
 }
+
 canvas{
   max-width:100%;
 }
@@ -51,13 +71,12 @@ canvas{
 
 <div class="container">
 
-<button onclick="goHome()">⬅ กลับไปทำแบบประเมิน</button>
+<button class="back-btn" onclick="goHome()">
+⬅ กลับไปทำแบบประเมิน
+</button>
+
 <h1>Dashboard แบบประเมินความพึงพอใจ</h1>
-<script>
-function goHome(){
-  window.location.href="index.html";
-}
-</script>
+
 <div class="card">
 <h2>จำนวนนักเรียนทั้งหมด</h2>
 <h1 id="total">0</h1>
@@ -82,8 +101,13 @@ function goHome(){
 </div>
 
 <script>
+
+function goHome(){
+  window.location.href="index.html";
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXudxK37GueTXEWFxJPvsUQsecwrOIbhw3SV_-dk5G0i2PlUYKbF8EmP9C2N7gMwss/exec";
-  
+
 let genderChart, roomChart, scoreChart;
 
 function loadData(){
@@ -140,10 +164,8 @@ function renderDashboard(data){
 
 loadData();
 setInterval(loadData,60000);
+
 </script>
 
 </body>
 </html>
-
-
-
