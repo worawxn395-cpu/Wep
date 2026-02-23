@@ -9,10 +9,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+*{box-sizing:border-box}
 body{
   font-family:'Noto Sans Thai',sans-serif;
   background:linear-gradient(135deg,#d4f5e9,#b7f0da);
   margin:0;
+  overflow-x:hidden;
 }
 
 .nav{
@@ -21,6 +23,7 @@ body{
   display:flex;
   justify-content:center;
   gap:15px;
+  flex-wrap:wrap;
 }
 
 .nav button{
@@ -42,10 +45,7 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-h1{
-  text-align:center;
-  color:#047857;
-}
+h1{text-align:center;color:#047857}
 
 input,select,textarea{
   width:100%;
@@ -53,6 +53,7 @@ input,select,textarea{
   margin-bottom:15px;
   border-radius:8px;
   border:1px solid #ccc;
+  font-size:15px;
 }
 
 .question{
@@ -60,17 +61,23 @@ input,select,textarea{
   padding:12px;
   background:#f0fdf4;
   border-radius:10px;
-  transition:0.3s;
 }
 
 .question.answered{
   border-bottom:4px solid #10b981;
 }
 
+.rating{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:8px;
+}
+
 .rating span{
-  font-size:28px;
+  font-size:26px;
   cursor:pointer;
-  margin-right:12px;
   transition:0.2s;
 }
 
@@ -89,6 +96,17 @@ button.submit{
   border-radius:10px;
   cursor:pointer;
 }
+
+@media (max-width:768px){
+  .container{margin:15px;padding:18px}
+}
+
+@media (max-width:480px){
+  .container{margin:10px;padding:15px}
+  .nav{flex-direction:column;align-items:center}
+  .nav button{width:100%;max-width:250px}
+  .rating span{font-size:22px}
+}
 </style>
 </head>
 
@@ -106,13 +124,11 @@ button.submit{
 
 <input type="text" id="name" placeholder="ชื่อ">
 <input type="number" id="no" placeholder="เลขที่">
-
 <select id="gender">
 <option value="">-- เลือกเพศ --</option>
 <option>ชาย</option>
 <option>หญิง</option>
 </select>
-
 <input type="text" id="room" placeholder="ห้องเรียน">
 
 <div id="questions"></div>
@@ -124,102 +140,93 @@ button.submit{
 </div>
 
 <script>
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygYmC-VC35wmBYr5nJc2J36Z3ps1FiJFfXZ0meSdeMwvpJCKIWu30-PCy5Fkpvrj4U/exec";
-
-function go(page){
-  window.location.href = page;
-}
-
-let questionData = [];
-let answers = {};
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbygYmC-VC35wmBYr5nJc2J36Z3ps1FiJFfXZ0meSdeMwvpJCKIWu30-PCy5Fkpvrj4U/exec";
+function go(p){window.location.href=p}
+let questionData=[],answers={}
 
 function loadQuestions(){
-  const script = document.createElement("script");
-  script.src = SCRIPT_URL + "?action=getQuestions&callback=renderQuestions";
-  document.body.appendChild(script);
+  const s=document.createElement("script")
+  s.src=SCRIPT_URL+"?action=getQuestions&callback=renderQuestions"
+  document.body.appendChild(s)
 }
 
 function renderQuestions(data){
-
-  // ตั้งหัวข้อจาก Google Sheet
-  document.getElementById("formTitle").innerText = data.title;
-
-  questionData = data.questions;
-
-  const container = document.getElementById("questions");
-  container.innerHTML="";
-
+  document.getElementById("formTitle").innerText=data.title
+  questionData=data.questions
+  const c=document.getElementById("questions")
+  c.innerHTML=""
   questionData.forEach(q=>{
-    const div = document.createElement("div");
-    div.className="question";
-
-    div.innerHTML = `
+    const d=document.createElement("div")
+    d.className="question"
+    d.innerHTML=`
       <label>${q.id}. ${q.question}</label>
       <div class="rating">
-        ${[5,4,3,2,1].map(score=>
-          `<span data-q="${q.id}" onclick="selectScore(${q.id},${score},this)">
-            ${q.emoji[score]}
+        ${[5,4,3,2,1].map(s=>
+          `<span data-q="${q.id}" onclick="selectScore(${q.id},${s},this)">
+            ${q.emoji[s]}
            </span>`
         ).join("")}
-      </div>
-    `;
-    container.appendChild(div);
-  });
+      </div>`
+    c.appendChild(d)
+  })
 }
 
 function selectScore(qid,score,el){
-
-  answers[qid]=score;
-
-  document.querySelectorAll(`[data-q='${qid}']`)
-    .forEach(s=>s.classList.remove("selected"));
-
-  el.classList.add("selected");
-  el.closest(".question").classList.add("answered");
+  answers[qid]=score
+  document.querySelectorAll(`[data-q='${qid}']`).forEach(s=>s.classList.remove("selected"))
+  el.classList.add("selected")
+  el.closest(".question").classList.add("answered")
 }
 
 function submitForm(){
+  const name=nameEl.value,
+        no=noEl.value,
+        gender=genderEl.value,
+        room=roomEl.value,
+        suggestion=suggestionEl.value
+}
 
-  const name = document.getElementById("name").value;
-  const no = document.getElementById("no").value;
-  const gender = document.getElementById("gender").value;
-  const room = document.getElementById("room").value;
-  const suggestion = document.getElementById("suggestion").value;
+const nameEl=document.getElementById("name")
+const noEl=document.getElementById("no")
+const genderEl=document.getElementById("gender")
+const roomEl=document.getElementById("room")
+const suggestionEl=document.getElementById("suggestion")
 
-  if(!name || !no || !gender || !room){
-    Swal.fire("กรอกข้อมูลให้ครบก่อน");
-    return;
+function submitForm(){
+  const name=nameEl.value,
+        no=noEl.value,
+        gender=genderEl.value,
+        room=roomEl.value,
+        suggestion=suggestionEl.value
+
+  if(!name||!no||!gender||!room){
+    Swal.fire("กรอกข้อมูลให้ครบก่อน")
+    return
   }
 
-  if(Object.keys(answers).length !== questionData.length){
-    Swal.fire("กรุณาตอบคำถามให้ครบทุกข้อ");
-    return;
+  if(Object.keys(answers).length!==questionData.length){
+    Swal.fire("กรุณาตอบคำถามให้ครบทุกข้อ")
+    return
   }
 
-  Swal.showLoading();
+  Swal.showLoading()
 
   fetch(SCRIPT_URL,{
     method:"POST",
     body:JSON.stringify({
-      name:name,
-      no:no,
-      gender:gender,
-      room:room,
+      name,no,gender,room,
       answers:Object.values(answers),
-      suggestion:suggestion
+      suggestion
     })
   })
-  .then(res=>res.json())
+  .then(r=>r.json())
   .then(()=>{
     Swal.fire("บันทึกสำเร็จ","ขอบคุณสำหรับการประเมิน","success")
-    .then(()=>location.reload());
-  });
-
+    .then(()=>location.reload())
+  })
 }
 
-loadQuestions();
-
+loadQuestions()
 </script>
 
 </body>
